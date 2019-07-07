@@ -13,8 +13,9 @@ class ResponseHandler private constructor() {
 
         call.enqueue(object : Callback<APIResponse<T>> {
             override fun onResponse(call: Call<APIResponse<T>>, response: Response<APIResponse<T>>) {
-                var message = ""
-                Log.d(""+response.body(),""+response.code())
+                var message = response.message()
+
+
                 when (response.code()) {
                     200 -> {
                         message = "OK"
@@ -42,26 +43,31 @@ class ResponseHandler private constructor() {
                         serviceCallBack.onFailed(
                             ServiceError(
                                 "" + response.body()!!.responseCode,
-                                "" + response.body()!!.responseMessage)
+                                "" + response.body()!!.responseMessage
+                            )
 
                         )
                     }
                 }
                 try {
-                    Log.d("name",""+response.body())
-                        serviceCallBack.onSuccess(response.code(), message , response.body()!!.data!! )
+                    Log.d("name", "" + response.body())
+
+                        serviceCallBack.onSuccess(
+                            response.code(),
+                            message, response.body()
+                        )
 
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    serviceCallBack.onFailed(ServiceError(""+response.code(),""+e.message))
-                   // serviceCallBack.onSuccess(response.code(), message, response.body()?.data!!)
+                    serviceCallBack.onFailed(ServiceError("" + response.code(), "" + e.message))
+
                 }
             }
 
             override fun onFailure(call: Call<APIResponse<T>>, t: Throwable) {
 
                 serviceCallBack.onFailed(ServiceError(t.localizedMessage, t.message))
-                 Log.d("Error" + t.message, "" + t.localizedMessage)
+                Log.d("Error" + t.message, "" + t.localizedMessage)
             }
         })
 
